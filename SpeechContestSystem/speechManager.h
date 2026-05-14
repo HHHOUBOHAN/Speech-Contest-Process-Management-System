@@ -34,19 +34,46 @@ public:
 
 	//抽签
 	void speechDraw();
+
+
+	//比赛
+	void speechContest();
+
+	//显示比赛结果
+	void showScore();
+
+	//保存分数
+	void saveRecord();
+
+	//读取记录
+	void loadRecord();
 	
 	//析构函数
 	~speechManager();
 
 	//比赛选手
 	vector<int> v0;
+
 	//第一轮
 	vector<int> v1;
 	//第二轮
 	vector<int> v2;
+
+	//前三名
+	vector<int> Victory;
+
 	//编号何具体选手姓名的容器
 	map<int, speaker> m;
 	//比赛轮数
 	int m_index;
+
+	//文件为空的标志
+	bool fileIsEmpty;
+
+	//往届记录
+	map<int, vector<string>> record;
+
+
+
 };
 

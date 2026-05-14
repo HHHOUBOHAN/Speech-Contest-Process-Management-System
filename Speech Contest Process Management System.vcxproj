@@ -128,8 +128,12 @@
     <ClCompile Include="SpeechContestSystem\speechManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SpeechContestSystem\speaker.h" />
     <ClInclude Include="SpeechContestSystem\speechManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Speech Contest Process Management System.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -47,6 +47,13 @@ public:
 
 	//读取记录
 	void loadRecord();
+
+	//查看往届记录
+	void showRecord();
+
+	//清空
+	void clearRecord();
+
 	
 	//析构函数
 	~speechManager();

@@ -1,5 +1,4 @@
 #define _CRT_SECURE_NO_WARNINGS 1
-
 #include <iostream>
 #include <ctime>
 #include "speechManager.h"
@@ -27,16 +26,18 @@ int main()
             break;
         case 2:
             //查看记录
+            sw.showRecord();
             break;
         case 3:
             //清空记录
+            sw.clearRecord();
             break;
         default:
+            sw.clearRecord();
             //退出系统
             system("cls");
             break;
         }
-
     }
 }
 

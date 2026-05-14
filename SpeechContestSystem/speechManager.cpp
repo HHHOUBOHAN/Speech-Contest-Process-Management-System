@@ -5,6 +5,7 @@
 #include <numeric>
 #include <deque>
 #include <vector>
+#include <iomanip> //setw 输出格式规范
 #include "speechManager.h"
 #include "speaker.h"
 using namespace std;
@@ -12,7 +13,10 @@ using namespace std;
 //构造函数
 speechManager::speechManager()
 {
+	//先初始化 后创建 要不然创建也是会被初始化
 	this->initSpeach();
+
+	this->createSpeaker();
 
 	this->loadRecord();
 }
@@ -66,7 +70,7 @@ void speechManager::createSpeaker()
 //开始比赛
 void speechManager::startSpeech()
 {
-	this->createSpeaker();
+	
 	this->m_index++;
 	//抽签
 	this->speechDraw(); 
@@ -83,6 +87,17 @@ void speechManager::startSpeech()
 	this->showScore();
 	//保存分数
 	this->saveRecord();
+
+
+	//比赛后重置比赛（同构造函数相同）
+	//初始化容器和属性
+	this->initSpeach();
+
+	//创建12名选手
+	this->createSpeaker();
+
+	//加载往届记录
+	this->loadRecord();
 }
 //抽签
 void speechManager::speechDraw()
@@ -135,7 +150,6 @@ void speechManager::speechContest()
 	}
 	else
 	{
-
 		vc.resize(6);
 		vc = v2;
 	}
@@ -153,18 +167,11 @@ void speechManager::speechContest()
 			d.push_back(score);
 
 		}
-		/*cout << *it << "打分如下:" << endl;
-
-		for (deque<double>::iterator dit = d.begin(); dit != d.end(); dit++)
-		{
-			cout << *dit << " ";
-		}
-		cout << endl;*/
 	    //排序  去掉最高最低  取平均
 		sort(d.begin(), d.end(), greater<double>());
 		d.pop_front();
 		d.pop_back();
-		double sum = accumulate(d.begin(), d.end(), 0.0); // 0.0f → float 类型0.0 → double 类型
+		double sum = accumulate(d.begin(), d.end(),0.0)/10; // 0.0f → float 类型0.0 → double 类型
 
 		//更新speak 的 score
 		m[*it].m_score[m_index - 1] = sum;
@@ -177,7 +184,7 @@ void speechManager::speechContest()
 
 			for (multimap<double, int, greater<double>>::iterator bit = mul.begin(); bit != mul.end() && count < 3; bit++, count++)
 			{
-				cout <<"姓名" <<m[bit->second].m_name<< " 编号" << bit->second << " 成绩" << bit->first <<"排名"<<count+1<< endl;
+				cout <<"姓名" <<m[bit->second].m_name<< " 编号" << bit->second << " 成绩" << bit->first << "排名" << count + 1 << endl;
 				//插入
 				if (m_index == 1)
 				{
@@ -194,7 +201,7 @@ void speechManager::speechContest()
 		}
 		
 	}
-	cout << this->m_index << "轮比赛已经over" << endl;
+	cout <<"第" << this->m_index << "轮比赛已经over" << endl;
 	system("pause");
 }
 
@@ -232,7 +239,11 @@ void speechManager::saveRecord()
 	}
 	ofs << "\n";//ofs << endl;
 	ofs.close();
+	
 	cout << "文件储存成功" << endl;
+
+	//更改文件状态
+	this->fileIsEmpty = false;
 }
 //读取记录
 void  speechManager::loadRecord()
@@ -252,7 +263,7 @@ void  speechManager::loadRecord()
 	if (ifs.eof())
 	{
 		this->fileIsEmpty = true;
-		cout << "文件为空" << endl;
+		cout << "文件为空或不存在" << endl;
 		ifs.close();//关闭文件
 		return;
 	}
@@ -278,33 +289,84 @@ void  speechManager::loadRecord()
 				break;
 			}
 			
-			string temp = data.substr(start, pos);
+			string temp = data.substr(start, pos - start);//这个第二个参数是长度
 			k.push_back(temp);
-			cout << temp;
-
 			start = pos+1;
 		}
-		cout << index;
-		record.insert(make_pair(1,k));
+		record.insert(make_pair(index,k));
 		index++;
 	}
 	ifs.close();
 }
 //查看往届记录
+void speechManager::showRecord()
+{
+	if (this->fileIsEmpty)
+	{
+		cout << "文件为空或者文件不存在" << endl;
+	}
+	for (int i = 0; i < this->record.size(); i++)
+	{
+		cout << "第" << i + 1 << "届比赛的前三名" << endl;
+			cout << left // 设置左对齐
+			<< "冠军  "
+			<< "编号: " << setw(4) << this->record[i][0]
+			<< " 姓名: " << setw(10) << this->record[i][1]
+			<< " 成绩: " << setw(6) << this->record[i][2]
 
+			<< " | 亚军  "
+			<< "编号: " << setw(4) << this->record[i][3]
+			<< " 姓名: " << setw(10) << this->record[i][4]
+			<< " 成绩: " << setw(6) << this->record[i][5]
+
+			<< " | 季军  "
+			<< "编号: " << setw(4) << this->record[i][6]
+			<< " 姓名: " << setw(10) << this->record[i][7]
+			<< " 成绩: " << setw(6) << this->record[i][8]
+			<< endl;
+	}
+	system("pause");
+	system("cls");
+}
 // 清空记录
+void speechManager::clearRecord()
+{
+	cout << "请选择" << endl;
+	cout << "1.确认清空 2.返回菜单" << endl;
 
+	int choice=0;//这个可以不赋初值吗
+	cin >> choice;
+
+	if (choice == 1)
+	{
+		ofstream ofs;
+		ofs.open("speech.csv", ios::trunc);
+		ofs.close();//打开后一定要关闭
+		this->initSpeach();
+
+		this->createSpeaker();
+		
+		
+		cout << "清空完毕！" << endl;
+		cout << "尝试加载 判断是否清空完毕" << endl;
+		this->loadRecord();
+
+	}
+	system("pause");
+	system("cls");
+}
 //容器置空
 void speechManager::initSpeach()
 {
+	//所有容器都清空 包括这个record
 	this->v0.clear();
 	this->v1.clear();
 	this->v2.clear();
 	this->m.clear();
+	this->Victory.clear();
+	this->record.clear();
 	this->m_index = 0;
 }
-
-
 //析构函数
 speechManager::~speechManager()
 {
